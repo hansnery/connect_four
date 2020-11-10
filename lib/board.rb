@@ -4,7 +4,7 @@
 class Board
   require_relative 'player'
 
-  attr_reader :empty_tile, :column1, :column2, :column3, :column4, :column5, :column6, :column7
+  attr_reader :empty_tile, :column1, :column2, :column3, :column4, :column5, :column6, :column7, :columns, :lines
 
   def initialize
     @empty_tile = '  '
@@ -16,12 +16,6 @@ class Board
     @column6 = [@empty_tile, @empty_tile, @empty_tile, @empty_tile, @empty_tile, @empty_tile]
     @column7 = [@empty_tile, @empty_tile, @empty_tile, @empty_tile, @empty_tile, @empty_tile]
     @columns = [@column1, @column2, @column3, @column4, @column5, @column6, @column7]
-    define_colors
-  end
-
-  def define_colors
-    @white = '⚪'
-    @black = '⚫'
   end
 
   def display_board
@@ -45,42 +39,13 @@ class Board
     @lines = @columns.transpose
   end
 
-  def check_for_win
-    check_elements(@columns)
-    check_elements(@lines)
-  end
-
-  def check_elements(array)
-    white_counter = 0
-    black_counter = 0
-    array.each do |el|
-      break if white_counter > 3 || black_counter > 3
-
-      white_counter = count_balls(el, white_counter, @white)
-      black_counter = count_balls(el, black_counter, @black)
-    end
-    show_winner(white_counter, black_counter)
-  end
-
-  def count_balls(array, counter, symbol)
-    array.each do |el|
-      break if counter > 3
-
-      if el == symbol
-        counter += 1
-      else
-        counter = 0
-      end
-    end
-    counter
-  end
-
-  def create_diagonals(column_to_check = 0, next_element_to_check = 0, result = [])
+  def create_diagonals(column_to_check = 0, next_element_to_check = 0, result = [], right_to_left = false)
     (0..5).collect do |i|
-      column = i + column_to_check
-      break if column > 6
+      break if column_to_check + i > 6 && right_to_left == false
+      break if (column_to_check - i).negative? && right_to_left == true
 
-      el = @columns[i + column_to_check][i + next_element_to_check]
+      el = @columns[column_to_check + i][next_element_to_check + i] if right_to_left == false
+      el = @columns[column_to_check - i][next_element_to_check + i] if right_to_left == true
       result << el unless el.nil?
     end
     result
@@ -106,7 +71,7 @@ class Board
     result
   end
 
-  def diagonals_right_to_left(result = [])
+  def diagonals_left_to_right(result = [])
     check_lower_right.map do |i|
       result << i
     end
@@ -116,44 +81,33 @@ class Board
     result
   end
 
-  def show_winner(player1_counter, player2_counter)
-    white = 'white'
-    black = 'black'
-    puts 'White wins!' if player1_counter > 3
-    return white if player1_counter > 3
+  def check_lower_left(result = [])
+    i = 0
+    4.times do
+      diagonal = create_diagonals(3 + i, 0, [], true)
+      i += 1
+      result << diagonal
+    end
+    result
+  end
 
-    puts 'Black wins!' if player2_counter > 3
-    return black if player2_counter > 3
+  def check_upper_right(result = [])
+    i = 0
+    2.times do
+      diagonal = create_diagonals(6, 1 + i, [], true)
+      i += 1
+      result << diagonal
+    end
+    result
+  end
+
+  def diagonals_right_to_left(result = [])
+    check_lower_left.map do |i|
+      result << i
+    end
+    check_upper_right.map do |i|
+      result << i
+    end
+    result
   end
 end
-
-board = Board.new
-player1 = Player.new('white', 'Player One')
-player2 = Player.new('black', 'Player Two')
-board.insert_ball(board.column1, player1)
-board.insert_ball(board.column2, player2)
-board.insert_ball(board.column2, player2)
-board.insert_ball(board.column1, player2)
-board.insert_ball(board.column3, player1)
-board.insert_ball(board.column3, player2)
-board.insert_ball(board.column3, player1)
-board.insert_ball(board.column3, player2)
-board.insert_ball(board.column4, player1)
-board.insert_ball(board.column4, player1)
-board.insert_ball(board.column1, player1)
-board.insert_ball(board.column4, player2)
-board.insert_ball(board.column4, player1)
-board.insert_ball(board.column5, player2)
-board.insert_ball(board.column5, player2)
-board.insert_ball(board.column5, player1)
-board.insert_ball(board.column5, player1)
-board.insert_ball(board.column5, player1)
-board.insert_ball(board.column6, player1)
-board.insert_ball(board.column6, player1)
-board.insert_ball(board.column6, player1)
-board.insert_ball(board.column6, player2)
-board.insert_ball(board.column6, player2)
-board.insert_ball(board.column6, player2)
-board.check_for_win
-p board.diagonals_right_to_left
-board.display_board
