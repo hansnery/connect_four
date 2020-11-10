@@ -76,20 +76,44 @@ class Board
   end
 
   def create_diagonals(column_to_check = 0, next_element_to_check = 0, result = [])
-    (0..5).collect do |j|
-      el = @columns[j + column_to_check][j + next_element_to_check]
+    (0..5).collect do |i|
+      column = i + column_to_check
+      break if column > 6
+
+      el = @columns[i + column_to_check][i + next_element_to_check]
       result << el unless el.nil?
     end
     result
   end
 
-  def diagonals_to_check(i = 0, j = 0, result = [])
+  def check_lower_right(result = [])
+    i = 3
+    3.times do
+      diagonal = create_diagonals(i)
+      i -= 1
+      result << diagonal
+    end
+    result
+  end
+
+  def check_upper_left(result = [])
+    i = 0
     3.times do
       diagonal = create_diagonals(0, 0 + i)
       i += 1
-      result << diagonal if diagonal.size > 3
+      result << diagonal
     end
-    p result
+    result
+  end
+
+  def diagonals_right_to_left(result = [])
+    check_lower_right.map do |i|
+      result << i
+    end
+    check_upper_left.map do |i|
+      result << i
+    end
+    result
   end
 
   def show_winner(player1_counter, player2_counter)
@@ -131,6 +155,5 @@ board.insert_ball(board.column6, player2)
 board.insert_ball(board.column6, player2)
 board.insert_ball(board.column6, player2)
 board.check_for_win
-# board.check_diagonals
-board.diagonals_to_check
+p board.diagonals_right_to_left
 board.display_board
