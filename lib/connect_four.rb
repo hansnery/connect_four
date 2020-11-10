@@ -8,21 +8,43 @@ class ConnectFour
 
   def initialize
     @board = Board.new
-    @player1 = Player.new('white', 'Player One')
-    @player2 = Player.new('black', 'Player Two')
-    define_colors
+    puts 'Welcome to Connect Four!'
+    @board.display_board
+    create_players
+    @game_over = false
+    run_game
   end
 
-  def define_colors
-    @white = '⚪'
-    @black = '⚫'
+  def create_players
+    puts "\nPlease, insert name of Player 1:"
+    player1_name = gets.chomp
+    @player1 = Player.new('white', player1_name)
+    puts "\nPlease, insert name of Player 2:"
+    player2_name = gets.chomp
+    @player2 = Player.new('black', player2_name)
+    puts "\n#{@player1.name} will play as White and #{@player2.name} will play as Black!\n\n"
+  end
+
+  def run_game
+    while @game_over == false
+      play_turn(@player1) if @game_over == false
+      play_turn(@player2) if @game_over == false
+    end
+  end
+
+  def play_turn(player)
+    puts "\n#{player.name}'s Turn!\nInsert number of the column to put a ball:"
+    play = gets.chomp.to_i
+    @board.insert_ball(@board.columns[play - 1], player)
+    @board.display_board
+    check_for_win
   end
 
   def check_for_win
-    return if check_elements(@board.columns)
-    return if check_elements(@board.lines)
-    return if check_elements(@board.diagonals_left_to_right)
-    return if check_elements(@board.diagonals_right_to_left)
+    check_elements(@board.columns)
+    check_elements(@board.lines)
+    check_elements(@board.diagonals_left_to_right)
+    check_elements(@board.diagonals_right_to_left)
   end
 
   def check_elements(array)
@@ -31,10 +53,10 @@ class ConnectFour
     array.each do |el|
       break if white_counter > 3 || black_counter > 3
 
-      white_counter = count_balls(el, white_counter, @white)
-      black_counter = count_balls(el, black_counter, @black)
+      white_counter = count_balls(el, white_counter, @player1.symbol)
+      black_counter = count_balls(el, black_counter, @player2.symbol)
     end
-    show_winner(white_counter, black_counter)
+    check_for_winner(white_counter, black_counter)
   end
 
   def count_balls(array, counter, symbol)
@@ -50,43 +72,11 @@ class ConnectFour
     counter
   end
 
-  def show_winner(player1_counter, player2_counter)
-    white = 'white'
-    black = 'black'
+  def check_for_winner(player1_counter, player2_counter)
     puts 'White wins!' if player1_counter > 3
-    return white if player1_counter > 3
-
     puts 'Black wins!' if player2_counter > 3
-    return black if player2_counter > 3
+    @game_over = true if player1_counter > 3 || player2_counter > 3
   end
 end
 
-game = ConnectFour.new
-game.board.insert_ball(game.board.column1, game.player1)
-game.board.insert_ball(game.board.column2, game.player2)
-game.board.insert_ball(game.board.column2, game.player2)
-game.board.insert_ball(game.board.column1, game.player2)
-game.board.insert_ball(game.board.column3, game.player1)
-game.board.insert_ball(game.board.column3, game.player2)
-game.board.insert_ball(game.board.column3, game.player1)
-game.board.insert_ball(game.board.column3, game.player2)
-game.board.insert_ball(game.board.column4, game.player1)
-game.board.insert_ball(game.board.column4, game.player1)
-game.board.insert_ball(game.board.column1, game.player1)
-game.board.insert_ball(game.board.column4, game.player2)
-game.board.insert_ball(game.board.column4, game.player1)
-game.board.insert_ball(game.board.column5, game.player2)
-game.board.insert_ball(game.board.column5, game.player2)
-game.board.insert_ball(game.board.column5, game.player1)
-game.board.insert_ball(game.board.column5, game.player1)
-game.board.insert_ball(game.board.column5, game.player1)
-game.board.insert_ball(game.board.column6, game.player1)
-game.board.insert_ball(game.board.column6, game.player1)
-game.board.insert_ball(game.board.column6, game.player1)
-game.board.insert_ball(game.board.column6, game.player2)
-game.board.insert_ball(game.board.column6, game.player2)
-game.board.insert_ball(game.board.column6, game.player2)
-game.board.display_board
-# p game.board.check_upper_right
-# p game.diagonals_right_to_left
-game.check_for_win
+ConnectFour.new
