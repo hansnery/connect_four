@@ -35,11 +35,11 @@ class ConnectFour
   def play_turn(player)
     puts "\n#{player.name}'s Turn!\nInsert number of the column to put a ball:"
     play = check_input
-    if @game_over == false
-      @board.insert_ball(@board.columns[play.to_i - 1], player)
-      @board.display_board
-      check_for_win
-    end
+    return unless @game_over == false
+
+    @board.insert_ball(@board.columns[play.to_i - 1], player)
+    @board.display_board
+    check_for_win
   end
 
   def check_input

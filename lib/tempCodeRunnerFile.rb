@@ -1,1 +1,1 @@
-2
+return unless @game_over == false
