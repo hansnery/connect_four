@@ -34,10 +34,24 @@ class ConnectFour
 
   def play_turn(player)
     puts "\n#{player.name}'s Turn!\nInsert number of the column to put a ball:"
-    play = gets.chomp.to_i
-    @board.insert_ball(@board.columns[play - 1], player)
-    @board.display_board
-    check_for_win
+    play = check_input
+    if @game_over == false
+      @board.insert_ball(@board.columns[play.to_i - 1], player)
+      @board.display_board
+      check_for_win
+    end
+  end
+
+  def check_input
+    input = gets.chomp
+    if input =~ /\A[1-7]\z/
+      input
+    elsif input == 'exit'
+      @game_over = true
+    else
+      puts "Try a number between 1 and 7 or type 'exit' to leave the game."
+      check_input
+    end
   end
 
   def check_for_win
