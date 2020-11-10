@@ -73,8 +73,14 @@ class ConnectFour
   end
 
   def check_for_winner(player1_counter, player2_counter)
-    puts 'White wins!' if player1_counter > 3
-    puts 'Black wins!' if player2_counter > 3
+    if player1_counter > 3
+      puts 'White wins!'
+      @player1.wins += 1
+    end
+    if player2_counter > 3
+      puts 'Black wins!'
+      @player2.wins += 1
+    end
     @game_over = true if player1_counter > 3 || player2_counter > 3
   end
 end
